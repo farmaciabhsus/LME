@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário LME Digital</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --primary-blue: #004b8d;
+            --border-color: #000;
+        }
+        body { font-family: Arial, sans-serif; background: #f0f0f0; margin: 0; padding: 20px; }
+        .no-print-area { max-width: 800px; margin: 0 auto 20px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        
+        /* Estilo da Folha LME */
+        .lme-page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 10mm;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+            font-size: 10pt;
+            box-sizing: border-box;
+            position: relative;
+        }
+        .header { display: flex; align-items: center; border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 10px; }
+        .header-text { flex: 1; text-align: center; font-weight: bold; text-transform: uppercase; font-size: 11pt; }
+        
+        .section-title { background: #eee; font-weight: bold; padding: 3px 5px; border: 1px solid var(--border-color); margin-top: 10px; font-size: 9pt; }
+        .grid-row { display: flex; border-left: 1px solid var(--border-color); border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
+        .field { padding: 5px; border-right: 1px solid #ccc; flex: 1; }
+        .field:last-child { border-right: none; }
+        label { display: block; font-size: 7pt; font-weight: bold; color: #333; margin-bottom: 2px; }
+        input, select, textarea { width: 100%; border: none; font-size: 10pt; outline: none; background: transparent; }
+        
+        .med-row { display: flex; border-bottom: 1px solid #eee; padding: 2px 0; }
+        .med-name { flex: 3; }
+        .med-qty { flex: 1; text-align: center; border-left: 1px solid #eee; }
+
+        @media print {
+            body { background: none; padding: 0; }
+            .no-print-area { display: none; }
+            .lme-page { margin: 0; box-shadow: none; }
+        }
+        
+        .btn { background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        .btn:hover { background: #218838; }
+    </style>
+</head>
+<body>
+
+<div class="no-print-area">
+    <h2>Gerador de LME Digital</h2>
+    <p>Preencha os campos abaixo. Ao clicar em "Salvar em PDF", o documento será gerado com a formatação oficial.</p>
+    <button class="btn" onclick="generatePDF()">Salvar em PDF</button>
+</div>
+
+<div id="lme-content" class="lme-page">
+    <div class="header">
+        <div class="header-text">
+            Sistema Único de Saúde - Ministério da Saúde<br>
+            LAUDO DE SOLICITAÇÃO, AVALIAÇÃO E AUTORIZAÇÃO DE MEDICAMENTO(S) - LME
+        </div>
+    </div>
+
+    <div class="section-title">1. CAMPOS DE PREENCHIMENTO EXCLUSIVO PELO MÉDICO SOLICITANTE</div>
+    
+    <div class="grid-row">
+        <div class="field" style="flex: 1;">
+            <label>1. NÚMERO DO CNES*</label>
+            <input type="text" placeholder="CNES">
+        </div>
+        <div class="field" style="flex: 3;">
+            <label>2. NOME DO ESTABELECIMENTO DE SAÚDE SOLICITANTE</label>
+            <input type="text" placeholder="Nome da Unidade">
+        </div>
+    </div>
+
+    <div class="grid-row">
+        <div class="field">
+            <label>3.1 NOME CIVIL COMPLETO DO PACIENTE*</label>
+            <input type="text" placeholder="Nome completo">
+        </div>
+    </div>
+
+    <div class="grid-row">
+        <div class="field" style="flex: 2;">
+            <label>4. NOME DA MÃE DO PACIENTE</label>
+            <input type="text">
+        </div>
+        <div class="field">
+            <label>5. PESO (KG)</label>
+            <input type="number">
+        </div>
+        <div class="field">
+            <label>6. ALTURA (CM)</label>
+            <input type="number">
+        </div>
+    </div>
+
+    <div class="section-title">7. MEDICAMENTO(S) SOLICITADO(S)</div>
+    <div class="grid-row" style="background: #f9f9f9; font-size: 8pt; font-weight: bold; text-align: center;">
+        <div class="field" style="flex: 3;">Nome do Medicamento</div>
+        <div class="field">1º mês</div>
+        <div class="field">2º mês</div>
+        <div class="field">3º mês</div>
+    </div>
+    
+    <!-- Linhas de Medicamentos -->
+    <div id="med-list">
+        <div class="grid-row">
+            <div class="field" style="flex: 3;">
+                <input type="text" class="med-input" list="med-options" placeholder="Selecione o medicamento...">
+            </div>
+            <div class="field"><input type="text" style="text-align:center"></div>
+            <div class="field"><input type="text" style="text-align:center"></div>
+            <div class="field"><input type="text" style="text-align:center"></div>
+        </div>
+        <div class="grid-row">
+            <div class="field" style="flex: 3;">
+                <input type="text" class="med-input" list="med-options">
+            </div>
+            <div class="field"><input type="text" style="text-align:center"></div>
+            <div class="field"><input type="text" style="text-align:center"></div>
+            <div class="field"><input type="text" style="text-align:center"></div>
+        </div>
+    </div>
+
+    <div class="section-title">8. DIAGNÓSTICO E ATUALIZAÇÃO</div>
+    <div class="grid-row">
+        <div class="field">
+            <label>CID-10 PRINCIPAL*</label>
+            <input type="text" id="cid-main">
+        </div>
+        <div class="field" style="flex: 3;">
+            <label>DIAGNÓSTICO</label>
+            <input type="text" id="diag-main">
+        </div>
+    </div>
+
+    <div class="grid-row" style="margin-top: 40px; border-bottom: none;">
+        <div class="field" style="border-top: 1px solid #000; text-align: center; margin: 0 20px;">
+            <label>Assinatura e Carimbo do Médico</label>
+        </div>
+        <div class="field" style="border-top: 1px solid #000; text-align: center; margin: 0 20px;">
+            <label>Data da Solicitação</label>
+            <input type="date" value="2024-05-11">
+        </div>
+    </div>
+</div>
+
+<datalist id="med-options"></datalist>
+
+<script>
+    const medicamentos = [{"medicamento": "ABATACEPTE 125 mg/mL (SERINGA PREENCHIDA)", "CID-10": "M05.0", "checklist": "Artrite Reumatoide"}, {"medicamento": "ABATACEPTE 125 mg/mL (SERINGA PREENCHIDA)", "CID-10": "M05.1", "checklist": "Artrite Reumatoide"}, {"medicamento": "ABATACEPTE 125 mg/mL (SERINGA PREENCHIDA)", "CID-10": "M05.2", "checklist": "Artrite Reumatoide"}, {"medicamento": "ABATACEPTE 125 mg/mL (SERINGA PREENCHIDA)", "CID-10": "M05.3", "checklist": "Artrite Reumatoide"}, {"medicamento": "ABATACEPTE 125 mg/mL (SERINGA PREENCHIDA)", "CID-10": "M05.8", "checklist": "Artrite Reumatoide"}, {"medicamento": "ABATACEPTE 125 mg/mL (SERINGA PREENCHIDA)", "CID-10": "M06.0", "checklist": "Artrite Reumatoide"}, {"medicamento": "ABATACEPTE 125 mg/mL (SERINGA PREENCHIDA)", "CID-10": "M06.8", "checklist": "Artrite Reumatoide"}, {"medicamento": "ABATACEPTE 250 mg (FRASCO AMPOLA)", "CID-10": "M08.0", "checklist": "Artrite Idiop\u00e1tica Juvenil"}, {"medicamento": "ABATACEPTE 250 mg (FRASCO AMPOLA)", "CID-10": "M08.1", "checklist": "Artrite Idiop\u00e1tica Juvenil"}, {"medicamento": "ABATACEPTE 250 mg (FRASCO AMPOLA)", "CID-10": "M08.2", "checklist": "Artrite Idiop\u00e1tica Juvenil"}, {"medicamento": "ABATACEPTE 250 mg (FRASCO AMPOLA)", "CID-10": "M08.3", "checklist": "Artrite Idiop\u00e1tica Juvenil"}, {"medicamento": "ABATACEPTE 250 mg (FRASCO AMPOLA)", "CID-10": "M08.4", "checklist": "Artrite Idiop\u00e1tica Juvenil"}, {"medicamento": "ABATACEPTE 250 mg (FRASCO AMPOLA)", "CID-10": "M08.8", "checklist": "Artrite Idiop\u00e1tica Juvenil"}, {"medicamento": "ABATACEPTE 250 mg (FRASCO AMPOLA)", "CID-10": "M08.9", "checklist": "Artrite Idiop\u00e1tica Juvenil"}, {"medicamento": "\u00c1CIDO URSODESOXIC\u00d3LICO", "CID-10": "K74.3", "checklist": "Colangite Biliar Prim\u00e1ria"}, {"medicamento": "\u00c1CIDO ZOLEDR\u00d4NICO", "CID-10": "M88.0", "checklist": "Doen\u00e7a de Paget"}, {"medicamento": "\u00c1CIDO ZOLEDR\u00d4NICO", "CID-10": "M88.8", "checklist": "Doen\u00e7a de Paget"}, {"medicamento": "ACITRETINA", "CID-10": "L40.0", "checklist": "Psor\u00edase"}, {"medicamento": "ACITRETINA", "CID-10": "L40.1", "checklist": "Psor\u00edase"}, {"medicamento": "ACITRETINA", "CID-10": "L40.4", "checklist": "Psor\u00edase"}, {"medicamento": "ACITRETINA", "CID-10": "L40.8", "checklist": "Psor\u00edase"}, {"medicamento": "AMANTADINA", "CID-10": "G20", "checklist": "Doen\u00e7a de Parkinson"}, {"medicamento": "AMBRISENTANA", "CID-10": "I27.0", "checklist": "Hipertens\u00e3o Pulmonar"}, {"medicamento": "AMBRISENTANA", "CID-10": "I27.2", "checklist": "Hipertens\u00e3o Pulmonar"}, {"medicamento": "AMBRISENTANA", "CID-10": "I27.8", "checklist": "Hipertens\u00e3o Pulmonar"}, {"medicamento": "ATORVASTATINA", "CID-10": "E78.0", "checklist": "Dislipidemia"}, {"medicamento": "BARICITINIBE", "CID-10": "M05.0", "checklist": "Artrite Reumatoide"}, {"medicamento": "BARICITINIBE", "CID-10": "M05.1", "checklist": "Artrite Reumatoide"}, {"medicamento": "BEZAFIBRATO", "CID-10": "E78.0", "checklist": "Dislipidemia"}, {"medicamento": "BIOTINA", "CID-10": "E88.9", "checklist": "Defici\u00eancia de Biotinidase"}, {"medicamento": "BOSENTANA", "CID-10": "I27.0", "checklist": "Hipertens\u00e3o Pulmonar"}, {"medicamento": "BUDESONIDA", "CID-10": "J44.0", "checklist": "DPOC"}, {"medicamento": "BUDESONIDA", "CID-10": "J45.0", "checklist": "Asma"}, {"medicamento": "CABERGOLINA", "CID-10": "E22.0", "checklist": "Acromegalia"}, {"medicamento": "CABERGOLINA", "CID-10": "E22.1", "checklist": "Hiperprolactinemia"}, {"medicamento": "CALCIPOTRIOL", "CID-10": "L40.0", "checklist": "Psor\u00edase"}, {"medicamento": "CALCIPOTRIOL", "CID-10": "L40.1", "checklist": "Psor\u00edase"}, {"medicamento": "CALCITONINA", "CID-10": "M80.0", "checklist": "Osteoporose"}, {"medicamento": "CALCITONINA", "CID-10": "M88.0", "checklist": "Doen\u00e7a de Paget"}, {"medicamento": "CALCITRIOL", "CID-10": "E20.0", "checklist": "Hipoparatireoidismo"}, {"medicamento": "CALCITRIOL", "CID-10": "M80.0", "checklist": "Osteoporose"}, {"medicamento": "CERTOLIZUMABE PEGOL", "CID-10": "K50.0", "checklist": "Doen\u00e7a de Crohn"}, {"medicamento": "CERTOLIZUMABE PEGOL", "CID-10": "M05.0", "checklist": "Artrite Reumatoide"}, {"medicamento": "CICLOFOSFAMIDA", "CID-10": "D59.0", "checklist": "Anemia Hemol\u00edtica Autoimune"}, {"medicamento": "CICLOFOSFAMIDA", "CID-10": "L93.0", "checklist": "L\u00fapus Eritematoso"}, {"medicamento": "CICLOSPORINA", "CID-10": "D60.0", "checklist": "Fal\u00eancia Medular"}, {"medicamento": "CICLOSPORINA", "CID-10": "L40.0", "checklist": "Psor\u00edase"}, {"medicamento": "CINACALCETE", "CID-10": "N18.0", "checklist": "Doen\u00e7a Renal Cr\u00f4nica"}, {"medicamento": "CIPROFIBRATO", "CID-10": "E78.0", "checklist": "Dislipidemia"}, {"medicamento": "CLADRIBINA", "CID-10": "G35", "checklist": "Esclerose M\u00faltipla"}, {"medicamento": "CLOBAZAM", "CID-10": "G40.0", "checklist": "Epilepsia"}, {"medicamento": "CLOBETASOL", "CID-10": "L40.0", "checklist": "Psor\u00edase"}, {"medicamento": "CLOPIDOGREL", "CID-10": "I20.0", "checklist": "S\u00edndrome Coronariana"}, {"medicamento": "CLOROQUINA", "CID-10": "L93.0", "checklist": "L\u00fapus Eritematoso"}, {"medicamento": "CLOZAPINA", "CID-10": "F20.0", "checklist": "Esquizofrenia"}, {"medicamento": "CODE\u00cdNA", "CID-10": "R52.1", "checklist": "Dor Cr\u00f4nica"}, {"medicamento": "COLISTIMETATO", "CID-10": "E84.0", "checklist": "Fibrose C\u00edstica"}, {"medicamento": "DAPAGLIFLOZINA", "CID-10": "E11.2", "checklist": "Diabetes Tipo 2"}, {"medicamento": "DAPAGLIFLOZINA", "CID-10": "I50.0", "checklist": "Insufici\u00eancia Card\u00edaca"}, {"medicamento": "DEFERASIROX", "CID-10": "E83.1", "checklist": "Sobrecarga de ferro"}, {"medicamento": "DEFERIPRONA", "CID-10": "E83.1", "checklist": "Sobrecarga de ferro"}, {"medicamento": "DESFERROXAMINA", "CID-10": "E83.1", "checklist": "Sobrecarga de ferro"}, {"medicamento": "DESMOPRESSINA", "CID-10": "E23.2", "checklist": "Diabetes Ins\u00edpido"}, {"medicamento": "DONEPEZILA", "CID-10": "G30.0", "checklist": "Alzheimer"}, {"medicamento": "ECULIZUMABE", "CID-10": "D59.5", "checklist": "Hemoglobin\u00faria Parox\u00edstica Noturna"}, {"medicamento": "ELEXACAFTOR+TEZACAFTOR+IVACAFTOR", "CID-10": "E84.0", "checklist": "Fibrose C\u00edstica"}, {"medicamento": "ELEXACAFTOR+TEZACAFTOR+IVACAFTOR", "CID-10": "E84.1", "checklist": "Fibrose C\u00edstica"}, {"medicamento": "ELEXACAFTOR+TEZACAFTOR+IVACAFTOR", "CID-10": "E84.8", "checklist": "Fibrose C\u00edstica"}, {"medicamento": "ELTROMBOPAGUE", "CID-10": "D69.3", "checklist": "P\u00farpura Trombocitop\u00eanica Idiop\u00e1tica"}, {"medicamento": "ELTROMBOPAGUE", "CID-10": "D61.0", "checklist": "Fal\u00eancia Medular"}, {"medicamento": "ENOXAPARINA", "CID-10": "I82.0", "checklist": "Tromboembolismo Venoso"}, {"medicamento": "ENTACAPONA", "CID-10": "G20", "checklist": "Doen\u00e7a de Parkinson"}, {"medicamento": "ETANERCEPTE", "CID-10": "M05.0", "checklist": "Artrite Reumatoide"}, {"medicamento": "ETANERCEPTE", "CID-10": "M07.0", "checklist": "Artrite Psori\u00e1sica"}, {"medicamento": "ETOSSUXIMIDA", "CID-10": "G40.0", "checklist": "Epilepsia"}, {"medicamento": "EVEROLIMO", "CID-10": "T86.2", "checklist": "Transplante Card\u00edaco"}, {"medicamento": "EVEROLIMO", "CID-10": "T86.1", "checklist": "Transplante Renal"}, {"medicamento": "FENOFIBRATO", "CID-10": "E78.0", "checklist": "Dislipidemia"}, {"medicamento": "FENOTEROL", "CID-10": "J44.0", "checklist": "DPOC"}, {"medicamento": "FENOTEROL", "CID-10": "J45.0", "checklist": "Asma"}, {"medicamento": "FILGRASTIM", "CID-10": "B17.1", "checklist": "Hepatite C (altera\u00e7\u00f5es hematol\u00f3gicas)"}, {"medicamento": "FILGRASTIM", "CID-10": "D46.0", "checklist": "S\u00edndrome Mielodispl\u00e1sica"}, {"medicamento": "FINGOLIMODE", "CID-10": "G35", "checklist": "Esclerose M\u00faltipla"}, {"medicamento": "FLUDROCORTISONA", "CID-10": "E25.0", "checklist": "Hiperplasia Adrenal Cong\u00eanita"}, {"medicamento": "FLUTICASONA+UMECLID\u00cdNIO+VILANTEROL", "CID-10": "J44.0", "checklist": "DPOC"}, {"medicamento": "FORMOTEROL", "CID-10": "J44.0", "checklist": "DPOC"}, {"medicamento": "FORMOTEROL", "CID-10": "J45.0", "checklist": "Asma"}, {"medicamento": "FORMOTEROL+BUDESONIDA", "CID-10": "J44.0", "checklist": "DPOC"}, {"medicamento": "FORMOTEROL+BUDESONIDA", "CID-10": "J45.0", "checklist": "Asma"}, {"medicamento": "FUMARATO DE DIMETILA", "CID-10": "G35", "checklist": "Esclerose M\u00faltipla"}, {"medicamento": "GABAPENTINA", "CID-10": "G40.0", "checklist": "Epilepsia"}, {"medicamento": "GABAPENTINA", "CID-10": "R52.1", "checklist": "Dor Cr\u00f4nica"}, {"medicamento": "GALANTAMINA", "CID-10": "G30.0", "checklist": "Doen\u00e7a de Alzheimer"}, {"medicamento": "GALSULFASE", "CID-10": "E76.2", "checklist": "Mucopolissacaridose tipo VI"}, {"medicamento": "GANCICLOVIR", "CID-10": "Z94.0", "checklist": "Pacientes transplantados"}, {"medicamento": "GENFIBROZILA", "CID-10": "E78.0", "checklist": "Dislipidemia"}, {"medicamento": "GLATIR\u00c2MER", "CID-10": "G35", "checklist": "Esclerose M\u00faltipla"}, {"medicamento": "GLICOPIRR\u00d4NIO", "CID-10": "J44.0", "checklist": "DPOC"}, {"medicamento": "GOLIMUMABE", "CID-10": "M05.0", "checklist": "Artrite Reumatoide"}, {"medicamento": "GOLIMUMABE", "CID-10": "M07.0", "checklist": "Artrite Psori\u00e1sica"}, {"medicamento": "GOSSERRELINA", "CID-10": "D25.0", "checklist": "Leiomioma uterino"}, {"medicamento": "HIDROXICLOROQUINA", "CID-10": "L93.0", "checklist": "L\u00fapus Eritematoso"}, {"medicamento": "HIDROXICLOROQUINA", "CID-10": "M05.0", "checklist": "Artrite Reumatoide"}, {"medicamento": "HIDROXIUREIA", "CID-10": "D57.0", "checklist": "Doen\u00e7a Falciforme"}, {"medicamento": "IDURSULFASE", "CID-10": "E76.1", "checklist": "Mucopolissacaridose tipo II"}, {"medicamento": "ILOPROSTA", "CID-10": "I27.0", "checklist": "Hipertens\u00e3o Pulmonar"}, {"medicamento": "IMIGLUCERASE", "CID-10": "E75.2", "checklist": "Doen\u00e7a de Gaucher"}, {"medicamento": "IMUNOGLOBULINA HUMANA", "CID-10": "D80.0", "checklist": "Imunodefici\u00eancia prim\u00e1ria"}, {"medicamento": "IMUNOGLOBULINA HUMANA", "CID-10": "G61.0", "checklist": "S\u00edndrome Guillain-Barr\u00e9"}, {"medicamento": "INFLIXIMABE", "CID-10": "M05.0", "checklist": "Artrite Reumatoide"}, {"medicamento": "INFLIXIMABE", "CID-10": "K50.0", "checklist": "Doen\u00e7a de Crohn"}, {"medicamento": "INSULINA AN\u00c1LOGA", "CID-10": "E10.0", "checklist": "Diabetes Mellitus tipo 1"}, {"medicamento": "ISOTRETINO\u00cdNA", "CID-10": "L70.0", "checklist": "Acne grave"}, {"medicamento": "IVACAFTOR", "CID-10": "E84.0", "checklist": "Fibrose C\u00edstica"}, {"medicamento": "LAMOTRIGINA", "CID-10": "G40.0", "checklist": "Epilepsia"}, {"medicamento": "LAMOTRIGINA", "CID-10": "F31.1", "checklist": "Transtorno bipolar"}, {"medicamento": "LANREOTIDA", "CID-10": "E22.0", "checklist": "Acromegalia"}, {"medicamento": "LARONIDASE", "CID-10": "E76.0", "checklist": "Mucopolissacaridose tipo I"}, {"medicamento": "LEFLUNOMIDA", "CID-10": "M05.0", "checklist": "Artrite Reumatoide"}, {"medicamento": "LEFLUNOMIDA", "CID-10": "M07.0", "checklist": "Artrite Psori\u00e1sica"}, {"medicamento": "LEUPRORRELINA", "CID-10": "D25.0", "checklist": "Leiomioma uterino"}, {"medicamento": "LEUPRORRELINA", "CID-10": "E22.8", "checklist": "Puberdade precoce"}, {"medicamento": "LEVETIRACETAM", "CID-10": "G40.0", "checklist": "Epilepsia"}, {"medicamento": "LINEZOLIDA", "CID-10": "E84.0", "checklist": "Fibrose C\u00edstica"}, {"medicamento": "MEMANTINA", "CID-10": "G30.0", "checklist": "Doen\u00e7a de Alzheimer"}, {"medicamento": "MEPOLIZUMABE", "CID-10": "J45.0", "checklist": "Asma"}, {"medicamento": "MESALAZINA", "CID-10": "K50.0", "checklist": "Doen\u00e7a de Crohn"}, {"medicamento": "MESALAZINA", "CID-10": "K51.0", "checklist": "Retocolite ulcerativa"}, {"medicamento": "METADONA", "CID-10": "R52.1", "checklist": "Dor Cr\u00f4nica"}, {"medicamento": "METOTREXATO", "CID-10": "L40.0", "checklist": "Psor\u00edase"}, {"medicamento": "METOTREXATO", "CID-10": "M05.0", "checklist": "Artrite Reumatoide"}, {"medicamento": "MICOFENOLATO DE S\u00d3DIO", "CID-10": "T86.1", "checklist": "Transplante renal"}, {"medicamento": "MICOFENOLATO DE MOFETILA", "CID-10": "T86.2", "checklist": "Transplante card\u00edaco"}, {"medicamento": "MIGLUSTATE", "CID-10": "E75.2", "checklist": "Doen\u00e7a de Gaucher"}, {"medicamento": "MINOCICLINA", "CID-10": "E84.0", "checklist": "Fibrose C\u00edstica"}, {"medicamento": "MORFINA", "CID-10": "R52.1", "checklist": "Dor Cr\u00f4nica"}, {"medicamento": "NAPROXENO", "CID-10": "M02.1", "checklist": "Artrite reativa"}, {"medicamento": "NAPROXENO", "CID-10": "M05.0", "checklist": "Artrite Reumatoide"}, {"medicamento": "NATALIZUMABE", "CID-10": "G35", "checklist": "Esclerose M\u00faltipla"}, {"medicamento": "NINTEDANIBE", "CID-10": "J84.1", "checklist": "Doen\u00e7a pulmonar intersticial fibrosante"}, {"medicamento": "OLANZAPINA", "CID-10": "F20.0", "checklist": "Esquizofrenia"}, {"medicamento": "OLANZAPINA", "CID-10": "F25.0", "checklist": "Transtorno Esquizoafetivo"}, {"medicamento": "OLANZAPINA", "CID-10": "F31.1", "checklist": "Transtorno Bipolar"}, {"medicamento": "OMALIZUMABE", "CID-10": "J45.0", "checklist": "Asma"}, {"medicamento": "OMALIZUMABE", "CID-10": "J45.8", "checklist": "Asma"}, {"medicamento": "PANCREATINA", "CID-10": "E84.1", "checklist": "Fibrose C\u00edstica"}, {"medicamento": "PANCREATINA", "CID-10": "K86.0", "checklist": "Insufici\u00eancia Pancre\u00e1tica"}, {"medicamento": "PARICALCITOL", "CID-10": "E83.3", "checklist": "Doen\u00e7a Renal Cr\u00f4nica"}, {"medicamento": "PENICILAMINA", "CID-10": "E83.0", "checklist": "Doen\u00e7a de Wilson"}, {"medicamento": "PIRFENIDONA", "CID-10": "J84.1", "checklist": "Doen\u00e7a pulmonar intersticial"}, {"medicamento": "PIRIDOSTIGMINA", "CID-10": "G70.0", "checklist": "Miastenia Gravis"}, {"medicamento": "PRAMIPEXOL", "CID-10": "G20", "checklist": "Doen\u00e7a de Parkinson"}, {"medicamento": "PRIMIDONA", "CID-10": "G40.0", "checklist": "Epilepsia"}, {"medicamento": "QUETIAPINA", "CID-10": "F20.0", "checklist": "Esquizofrenia"}, {"medicamento": "QUETIAPINA", "CID-10": "F25.0", "checklist": "Transtorno Esquizoafetivo"}, {"medicamento": "QUETIAPINA", "CID-10": "F31.1", "checklist": "Transtorno Bipolar"}, {"medicamento": "RALOXIFENO", "CID-10": "M80.0", "checklist": "Osteoporose"}, {"medicamento": "RASAGILINA", "CID-10": "G20", "checklist": "Doen\u00e7a de Parkinson"}, {"medicamento": "RILUZOL", "CID-10": "G12.2", "checklist": "Esclerose Lateral Amiotr\u00f3fica"}, {"medicamento": "RISANQUIZUMABE", "CID-10": "L40.0", "checklist": "Psor\u00edase"}, {"medicamento": "RISDIPLAM", "CID-10": "G12.0", "checklist": "Atrofia Muscular Espinhal"}, {"medicamento": "RISEDRONATO", "CID-10": "M80.0", "checklist": "Osteoporose"}, {"medicamento": "RISEDRONATO", "CID-10": "M88.0", "checklist": "Doen\u00e7a de Paget"}, {"medicamento": "RISPERIDONA", "CID-10": "F20.0", "checklist": "Esquizofrenia"}, {"medicamento": "RISPERIDONA", "CID-10": "F84.0", "checklist": "TEA - comportamento agressivo"}, {"medicamento": "RITUXIMABE", "CID-10": "M31.3", "checklist": "Vasculite ANCA"}, {"medicamento": "RITUXIMABE", "CID-10": "M05.0", "checklist": "Artrite Reumatoide"}, {"medicamento": "RIVASTIGMINA", "CID-10": "G30.0", "checklist": "Doen\u00e7a de Alzheimer"}, {"medicamento": "RIVASTIGMINA", "CID-10": "G20", "checklist": "Doen\u00e7a de Parkinson"}, {"medicamento": "ROMOSOZUMABE", "CID-10": "M80.0", "checklist": "Osteoporose"}, {"medicamento": "SACARATO DE HIDR\u00d3XIDO F\u00c9RRICO", "CID-10": "N18.0", "checklist": "Anemia na Doen\u00e7a Renal Cr\u00f4nica"}, {"medicamento": "SACUBITRIL VALSARTANA", "CID-10": "I50.0", "checklist": "Insufici\u00eancia Card\u00edaca"}, {"medicamento": "SALMETEROL + FLUTICASONA", "CID-10": "J44.0", "checklist": "DPOC"}, {"medicamento": "SAPROPTERINA", "CID-10": "E70.0", "checklist": "Fenilceton\u00faria"}, {"medicamento": "SECUQUINUMABE", "CID-10": "L40.0", "checklist": "Psor\u00edase"}, {"medicamento": "SEVEL\u00c2MER", "CID-10": "N18.0", "checklist": "Doen\u00e7a Renal Cr\u00f4nica"}, {"medicamento": "SILDENAFILA", "CID-10": "I27.0", "checklist": "Hipertens\u00e3o Pulmonar"}, {"medicamento": "SIROLIMO", "CID-10": "T86.1", "checklist": "Transplante Renal"}, {"medicamento": "SOMATROPINA", "CID-10": "E23.0", "checklist": "Defici\u00eancia de GH"}, {"medicamento": "SULFASSALAZINA", "CID-10": "K50.0", "checklist": "Doen\u00e7a de Crohn"}, {"medicamento": "TACROLIMO", "CID-10": "T86.1", "checklist": "Transplante Renal"}, {"medicamento": "TAFAMIDIS", "CID-10": "E85.1", "checklist": "Amiloidose"}, {"medicamento": "TERIFLUNOMIDA", "CID-10": "G35", "checklist": "Esclerose M\u00faltipla"}, {"medicamento": "TIOTR\u00d3PIO", "CID-10": "J44.0", "checklist": "DPOC"}, {"medicamento": "TOBRAMICINA", "CID-10": "E84.0", "checklist": "Fibrose C\u00edstica"}, {"medicamento": "TOCILIZUMABE", "CID-10": "M05.0", "checklist": "Artrite Reumatoide"}, {"medicamento": "TOFACITINIBE", "CID-10": "M05.0", "checklist": "Artrite Reumatoide"}, {"medicamento": "TOPIRAMATO", "CID-10": "G40.0", "checklist": "Epilepsia"}, {"medicamento": "TOXINA BOTUL\u00cdNICA TIPO A", "CID-10": "G24.3", "checklist": "Distonias"}, {"medicamento": "UMECLID\u00cdNIO", "CID-10": "J44.0", "checklist": "Doen\u00e7a Pulmonar Obstrutiva Cr\u00f4nica"}, {"medicamento": "UMECLID\u00cdNIO + VILANTEROL", "CID-10": "J44.0", "checklist": "Doen\u00e7a Pulmonar Obstrutiva Cr\u00f4nica"}, {"medicamento": "UPADACITINIBE", "CID-10": "M05.0", "checklist": "Artrite Reumatoide"}, {"medicamento": "USTEQUINUMABE", "CID-10": "L40.0", "checklist": "Psor\u00edase"}, {"medicamento": "VEDOLIZUMABE", "CID-10": "K51.0", "checklist": "Retocolite Ulcerativa"}, {"medicamento": "VIGABATRINA", "CID-10": "G40.0", "checklist": "Epilepsia"}, {"medicamento": "ZIPRASIDONA", "CID-10": "F20.0", "checklist": "Esquizofrenia"}, {"medicamento": "ZIPRASIDONA", "CID-10": "F25.0", "checklist": "Transtorno Esquizoafetivo"}];
+
+    // Popular datalist
+    const dataList = document.getElementById('med-options');
+    const uniqueMeds = [...new Set(medicamentos.map(m => m.medicamento))];
+    uniqueMeds.forEach(med => {
+        const option = document.createElement('option');
+        option.value = med;
+        dataList.appendChild(option);
+    });
+
+    // Auto-completar CID quando selecionar medicamento
+    document.querySelectorAll('.med-input').forEach(input => {
+        input.addEventListener('change', function() {
+            const match = medicamentos.find(m => m.medicamento === this.value);
+            if (match) {
+                document.getElementById('cid-main').value = match['CID-10'];
+                document.getElementById('diag-main').value = match['checklist'];
+            }
+        });
+    });
+
+    function generatePDF() {
+        const element = document.getElementById('lme-content');
+        const opt = {
+            margin:       0,
+            filename:     'LME_Digital.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2 },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(element).save();
+    }
+</script>
+</body>
+</html>

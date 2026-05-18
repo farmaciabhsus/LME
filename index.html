@@ -10910,13 +10910,35 @@ function gerarPDF() {
   ori.style.display='none';
 
   const el=document.getElementById('lme-form');
+
+  // A4 portrait dimensions in mm and px at 96dpi
+  const A4_W_MM=210, A4_H_MM=297;
+  const MM_PER_PX=25.4/96;
+  const MARGIN_MM=4;
+
+  // Measure the natural rendered height of the form
+  const naturalW=el.offsetWidth;
+  const naturalH=el.offsetHeight;
+
+  // Available content area on A4 (mm)
+  const availW_mm=A4_W_MM - MARGIN_MM*2;
+  const availH_mm=A4_H_MM - MARGIN_MM*2;
+
+  // Scale factor to fit the entire form into one A4 page
+  const scaleW = availW_mm / (naturalW * MM_PER_PX);
+  const scaleH = availH_mm / (naturalH * MM_PER_PX);
+  const scale  = Math.min(scaleW, scaleH);
+
+  // html2canvas render width: scale the A4 content width back to px
+  const renderW = Math.round((availW_mm / MM_PER_PX) / scale);
+
   const opt={
-    margin:[6,6,6,6],
+    margin:[MARGIN_MM, MARGIN_MM, MARGIN_MM, MARGIN_MM],
     filename:'LME_Solicitacao_Medicamento.pdf',
     image:{type:'jpeg',quality:0.98},
-    html2canvas:{scale:2,useCORS:true,logging:false,letterRendering:true,windowWidth:820},
-    jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
-    pagebreak:{mode:['css','legacy']}
+    html2canvas:{scale:scale, useCORS:true, logging:false, letterRendering:true, windowWidth:renderW},
+    jsPDF:{unit:'mm', format:'a4', orientation:'portrait'},
+    pagebreak:{mode:[]}
   };
 
   html2pdf().set(opt).from(el).save().then(()=>{

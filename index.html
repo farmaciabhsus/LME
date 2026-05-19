@@ -144,7 +144,6 @@ textarea.req-empty{border-color:#9c0006 !important;background:#fce4e4 !important
   👉 Preencha todos os campos obrigatórios marcados com asterisco (*).<br>
   👉 Campos em vermelho ficam destacados até serem preenchidos.<br>
   Este formulário <b>não salva informações</b>, por isso salve em formato PDF, ao término do preenchimento e revisão.<br>
-  👉 O PDF deve ser assinado digitalmente, pelo seu certificado ICP-Brasil ou conta Gov.br (<a href="https://assinador.iti.br/" target="_blank">https://assinador.iti.br/</a>).<br>
   👉 O formulário pode conter erros, por isso sempre confira as informações sobre medicamentos, CID e diagnósticos, em:<br>
   a) Lista de medicamentos do CEAF (ordem alfabética): <a href="https://www.saude.mg.gov.br/obtermedicamentos/ceaf/lista-de-medicamentos-por-ordem-alfabetica-ceaf/" target="_blank">https://www.saude.mg.gov.br/obtermedicamentos/ceaf/lista-de-medicamentos-por-ordem-alfabetica-ceaf/</a><br>
   b) Lista de medicamentos do CEAF (por doença): <a href="https://www.saude.mg.gov.br/obtermedicamentos/ceaf/lista-de-medicamentos-por-doenca/" target="_blank">https://www.saude.mg.gov.br/obtermedicamentos/ceaf/lista-de-medicamentos-por-doenca/</a><br>
@@ -456,7 +455,7 @@ textarea.req-empty{border-color:#9c0006 !important;background:#fce4e4 !important
       <summary class="lbl" style="list-style: none; outline: none;">20. Telefone(s) para contato do paciente <span class="r">*</span></summary>
     </details>
     <div style="margin-top:4px;">
-      <input type="text" id="tel1" placeholder="(  )       " maxlength="15" oninput="maskTel(this)";chk(this);" onchange="chk(this) style="display:block;width:100%;border:none;border-bottom:1px solid #aaa;outline:none;font-size:10px;margin-bottom:5px;">
+      <input type="text" id="tel1" placeholder="(  )       " maxlength="15" oninput="maskTel(this);chk(this);" onchange="chk(this)" style="display:block;width:100%;border:none;border-bottom:1px solid #aaa;outline:none;font-size:10px;margin-bottom:5px;">
       <input type="text" id="tel2" placeholder="(  )       " maxlength="15" oninput="maskTel(this)" style="display:block;width:100%;border:none;border-bottom:1px solid #aaa;outline:none;font-size:10px;">
     </div>
   </div>
@@ -472,9 +471,9 @@ textarea.req-empty{border-color:#9c0006 !important;background:#fce4e4 !important
       <label><input type="radio" name="doc_tipo" value="CPF" onchange="onDocTipo()"> CPF</label>
       <label><input type="radio" name="doc_tipo" value="CNS" onchange="onDocTipo()"> CNS</label>
     </div>
-    <input type="text" id="doc_num" placeholder=" " style="margin-top:4px;width:100%;border:none;border-bottom:1px solid #aaa;outline:none;font-size:10px;" maxlength="18" oninput="docInput(this)";chk(this);" onchange="chk(this)>
+    <input type="text" id="doc_num" placeholder=" " style="margin-top:4px;width:100%;border:none;border-bottom:1px solid #aaa;outline:none;font-size:10px;" maxlength="18" oninput="docInput(this);chk(this);" onchange="chk(this)">
   </div>
-<div class="cell">
+  <div class="cell">
     <details style="display: inline-block; cursor: pointer;" title="Deve ser a assinatura da mesma pessoa identificada no campo ">
       <summary class="lbl" style="list-style: none; outline: none;">23. Assinatura do responsável pelo preenchimento <span class="r">*</span></summary>
     </details>
@@ -10756,12 +10755,12 @@ function buildMed() {
     const qty1Attr = (i===1) ? ' id="qty1" oninput="chkQty1(this)" onchange="chkQty1(this)"' : '';
     tr.innerHTML = `<td class="num">${i}</td>
       <td><select id="med${i}" onchange="onMedChg(${i})">${opts}</select></td>
-      <td class="qty"><input type="number" min="0" step="1" placeholder="0"${qty1Attr}></td>
-      <td class="qty"><input type="number" min="0" step="1" placeholder="0"></td>
-      <td class="qty"><input type="number" min="0" step="1" placeholder="0"></td>
-      <td class="qty"><input type="number" min="0" step="1" placeholder="0"></td>
-      <td class="qty"><input type="number" min="0" step="1" placeholder="0"></td>
-      <td class="qty"><input type="number" min="0" step="1" placeholder="0"></td>`;
+      <td class="qty"><input type="number" min="0" step="1" placeholder="0" inputmode="numeric" pattern="[0-9]*" oninput="this.value=this.value.replace(/[.,eE+-]/g,'')"${qty1Attr}></td>
+      <td class="qty"><input type="number" min="0" step="1" placeholder="0" inputmode="numeric" pattern="[0-9]*" oninput="this.value=this.value.replace(/[.,eE+-]/g,'')"></td>
+      <td class="qty"><input type="number" min="0" step="1" placeholder="0" inputmode="numeric" pattern="[0-9]*" oninput="this.value=this.value.replace(/[.,eE+-]/g,'')"></td>
+      <td class="qty"><input type="number" min="0" step="1" placeholder="0" inputmode="numeric" pattern="[0-9]*" oninput="this.value=this.value.replace(/[.,eE+-]/g,'')"></td>
+      <td class="qty"><input type="number" min="0" step="1" placeholder="0" inputmode="numeric" pattern="[0-9]*" oninput="this.value=this.value.replace(/[.,eE+-]/g,'')"></td>
+      <td class="qty"><input type="number" min="0" step="1" placeholder="0" inputmode="numeric" pattern="[0-9]*" oninput="this.value=this.value.replace(/[.,eE+-]/g,'')"></td>`;
     tb.appendChild(tr);
   }
   chkMed1();
